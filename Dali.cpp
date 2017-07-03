@@ -520,12 +520,57 @@ uint8_t Dali::receive() {
 
 }
 
+//funktioita eri dali-komentoja varten:
+
 void Dali::queryStatus()
 {
     dali.transmit(LIGHT_ADDRESS, QUERY_STATUS);
-    delay(5);
     Serial.println(dali.receive(), BIN);
 }
+
+void Dali::queryDeviceType()
+{
+    dali.transmit(LIGHT_ADDRESS, QUERY_DEVICE_TYPE);
+    Serial.println(dali.receive(), BIN);
+}
+
+void Dali::queryMaxLevel()
+{
+    dali.transmit(LIGHT_ADDRESS, QUERY_MAX_LEVEL);
+    Serial.println(dali.receive(), BIN);
+}
+
+void Dali::recallMaxLevel()
+{
+    dali.transmit(LIGHT_ADDRESS, RECALL_MAX_LEVEL);
+}
+
+void Dali::recallMinLevel()
+{
+    dali.transmit(LIGHT_ADDRESS, RECALL_MIN_LEVEL);
+}
+
+void Dali::up(uint8_t num)
+{
+    for(int i = 0; i < num; i++){
+        dali.transmit(LIGHT_ADDRESS, UP);
+    }
+}
+
+void Dali::down(uint8_t num)
+{
+    for(int i = 0; i < num; i++){
+        dali.transmit(LIGHT_ADDRESS, DOWN);  
+    }
+}
+
+void Dali::stepUp(uint8_t num)
+{
+    for(int i = 0; i < num; i++){
+        dali.transmit(LIGHT_ADDRESS, STEP_UP);
+    }
+}
+
 
 
 
