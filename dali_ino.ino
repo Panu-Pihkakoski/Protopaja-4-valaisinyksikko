@@ -15,6 +15,15 @@ const int DALI_RX_A = 0;
 # define QUERY_STATUS 0b10010000
 # define RESET 0b00100000
 
+//omaa koodia
+#define LIGHT_ADDRESS 0b00000001 //aina sama, koska kaytetaan vain yhta valoa
+#define QUERY_DEVICE_TYPE 0b10011001
+#define QUERY_MAX_LEVEL 0b10100001
+#define RECALL_MAX_LEVEL 0b00000101
+#define RECALL_MIN_LEVEL 0b00000110
+#define UP 0b00000001
+#define DOWN 0b00000011
+#define STEP_UP 0b00000011
 
 
 void setup() {
@@ -123,6 +132,7 @@ void loop() {
   }; //help
 
   if (comMsg == "status"){
+    Serial.println("Device status");
     dali.queryStatus();
   }
   if (comMsg == "loop"){
@@ -130,6 +140,34 @@ void loop() {
       dali.queryStatus();
       delay(500); 
     }
+  }
+  if (comMsg == "type"){
+    Serial.println("Device type:");
+    dali.queryDeviceType();
+  }
+  if(comMsg == "maxlvl"){
+    Serial.println("Max level:");
+    dali.queryMaxLevel();
+  }
+  if (comMsg == "max"){
+    Serial.println("Setting level to max");
+    dali.recallMaxLevel();
+  }
+  if (comMsg == "min"){
+    Serial.println("Setting level to min");
+    dali.recallMinLevel();
+  }
+  if (comMsg == "up"){
+    Serial.println("Power up");
+    dali.up(100);
+  }
+  if (comMsg == "down"){
+    Serial.println("Power down");
+    dali.down(100);
+  }
+  if (comMsg == "stepup"){
+    Serial.println("Step up");
+    dali.stepUp(1);
   }
 
 
@@ -139,4 +177,3 @@ void loop() {
   delay(delaytime);
 
 };
-
