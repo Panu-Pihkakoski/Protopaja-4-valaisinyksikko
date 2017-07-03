@@ -41,6 +41,13 @@ allowing us to transmit even with up to 100% in clock speed difference
 # define RESET 0b00100000
 //omaa koodia
 #define LIGHT_ADDRESS 0b00000001 //aina sama, koska kaytetaan vain yhta valoa
+#define QUERY_DEVICE_TYPE 0b10011001
+#define QUERY_MAX_LEVEL 0b10100001
+#define RECALL_MAX_LEVEL 0b00000101
+#define RECALL_MIN_LEVEL 0b00000110
+#define UP 0b00000001
+#define DOWN 0b00000011
+#define STEP_UP 0b00000011
 
 
 //setup timing for transmitter
@@ -74,6 +81,13 @@ class Dali
 	bool cmdCheck(String & input, int & cmd1, int & cmd2);
 	uint8_t receive(); //get response
     void queryStatus();
+    void queryDeviceType();
+    void queryMaxLevel();
+    void recallMaxLevel();
+    void recallMinLevel();
+    void up(uint8_t num);
+    void down(uint8_t num);
+    void stepUp(uint8_t num);
 
 	int minResponseLevel(); 
 	int maxResponseLevel();
