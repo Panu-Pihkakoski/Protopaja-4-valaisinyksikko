@@ -41,13 +41,26 @@ allowing us to transmit even with up to 100% in clock speed difference
 # define RESET 0b00100000
 //omaa koodia
 #define LIGHT_ADDRESS 0b00000001 //aina sama, koska kaytetaan vain yhta valoa
+#define LIGHT_ADDRESS_2 0b00000000 //osoite, kun annetaan suora ohjausarvo
 #define QUERY_DEVICE_TYPE 0b10011001
+#define QUERY_ACTUAL_LEVEL 0b10100000
 #define QUERY_MAX_LEVEL 0b10100001
+#define QUERY_MIN_LEVEL 0b10100010
 #define RECALL_MAX_LEVEL 0b00000101
 #define RECALL_MIN_LEVEL 0b00000110
 #define UP 0b00000001
-#define DOWN 0b00000011
+#define DOWN 0b00000010
 #define STEP_UP 0b00000011
+#define STEP_DOWN_AND_OFF 0b00000111
+#define ON_AND_STEP_UP 0b00001000
+#define STORE_DTR 0b00100001
+#define SAVE_FADE_RATE 0b00101111
+#define SAVE_FADE_TIME 0b00101110
+#define QUERY_LAMP_POWER_ON 0b10010011
+#define QUERY_LAMP_FAILURE 0b10010010
+#define QUERY_POWER_FAILURE 0b10011011
+#define QUERY_FADE_TIME_AND_RATE 0b10100101
+
 
 
 //setup timing for transmitter
@@ -83,11 +96,18 @@ class Dali
     void queryStatus();
     void queryDeviceType();
     void queryMaxLevel();
+    void queryMinLevel();
+    void queryActualLevel();
     void recallMaxLevel();
     void recallMinLevel();
     void up(uint8_t num);
     void down(uint8_t num);
     void stepUp(uint8_t num);
+    void setLevel(uint8_t num);
+    void setFade();
+    void queryLampPowerOn();
+    void queryLampFailure();
+    void queryFadeTimeAndRate();
 
 	int minResponseLevel(); 
 	int maxResponseLevel();
