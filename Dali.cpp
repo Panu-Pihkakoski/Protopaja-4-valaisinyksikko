@@ -540,6 +540,19 @@ void Dali::queryMaxLevel()
     Serial.println(dali.receive(), BIN);
 }
 
+void Dali::queryMinLevel()
+{
+    dali.transmit(LIGHT_ADDRESS, QUERY_MIN_LEVEL);
+    Serial.println(dali.receive(), BIN);
+
+}
+
+void Dali::queryActualLevel()
+{
+    dali.transmit(LIGHT_ADDRESS, QUERY_ACTUAL_LEVEL);
+    Serial.println(dali.receive(), BIN);
+}
+
 void Dali::recallMaxLevel()
 {
     dali.transmit(LIGHT_ADDRESS, RECALL_MAX_LEVEL);
@@ -552,23 +565,52 @@ void Dali::recallMinLevel()
 
 void Dali::up(uint8_t num)
 {
-    for(int i = 0; i < num; i++){
+    //for(int i = 0; i < num; i++){
         dali.transmit(LIGHT_ADDRESS, UP);
-    }
+    //}
 }
 
 void Dali::down(uint8_t num)
 {
-    for(int i = 0; i < num; i++){
+    //for(int i = 0; i < num; i++){
         dali.transmit(LIGHT_ADDRESS, DOWN);  
-    }
+    //}
 }
 
 void Dali::stepUp(uint8_t num)
 {
-    for(int i = 0; i < num; i++){
+    for(uint8_t i = 0; i < num; i++){
         dali.transmit(LIGHT_ADDRESS, STEP_UP);
     }
+}
+
+void Dali::setLevel(uint8_t num)
+{
+    dali.transmit(LIGHT_ADDRESS_2, num); 
+}
+
+void Dali::setFade()
+{
+    dali.transmit(LIGHT_ADDRESS, STORE_DTR);
+    dali.transmit(LIGHT_ADDRESS, SAVE_FADE_RATE);
+}
+
+void Dali::queryLampPowerOn()
+{
+    dali.transmit(LIGHT_ADDRESS, QUERY_LAMP_POWER_ON);
+    Serial.println(dali.receive(), BIN);
+}
+
+void Dali::queryLampFailure()
+{
+    dali.transmit(LIGHT_ADDRESS, QUERY_LAMP_FAILURE);
+    Serial.println(dali.receive(), BIN);
+}
+
+void Dali::queryFadeTimeAndRate()
+{
+    dali.transmit(LIGHT_ADDRESS, QUERY_FADE_TIME_AND_RATE);
+    Serial.println(dali.receive(), BIN);
 }
 
 
