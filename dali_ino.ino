@@ -22,7 +22,7 @@ const int DALI_RX_A = 0;
 #define RECALL_MAX_LEVEL 0b00000101
 #define RECALL_MIN_LEVEL 0b00000110
 #define UP 0b00000001
-#define DOWN 0b00000011
+#define DOWN 0b00000010
 #define STEP_UP 0b00000011
 
 
@@ -145,9 +145,13 @@ void loop() {
     Serial.println("Device type:");
     dali.queryDeviceType();
   }
-  if(comMsg == "maxlvl"){
+  if(comMsg == "querylvl"){
+    Serial.println("Current level:");
+    dali.queryActualLevel();
     Serial.println("Max level:");
     dali.queryMaxLevel();
+    Serial.println("Min level:");
+    dali.queryMinLevel();
   }
   if (comMsg == "max"){
     Serial.println("Setting level to max");
@@ -158,18 +162,43 @@ void loop() {
     dali.recallMinLevel();
   }
   if (comMsg == "up"){
+    //dali.setFade();
     Serial.println("Power up");
-    dali.up(100);
+    dali.up(1);
   }
   if (comMsg == "down"){
+    //dali.setFade();
     Serial.println("Power down");
-    dali.down(100);
+    dali.down(1);
   }
   if (comMsg == "stepup"){
     Serial.println("Step up");
-    dali.stepUp(1);
+    dali.stepUp(30);
   }
-
+  if (comMsg =="lvl"){
+    Serial.println("Setting level to 100");
+    dali.setLevel(0b11100000);
+  }
+  if (comMsg =="fade"){
+    Serial.println("Setting fade rate and time");
+    dali.setFade();
+  }
+  if (comMsg =="up2"){
+    for(int i = 0; i < 10; i++){
+      dali.up(1);
+      delay(250);
+    }
+  }
+  if (comMsg =="querylamp"){
+    Serial.println("Lamp power on:");
+    dali.queryLampPowerOn();
+    Serial.println("Lamp failure:");
+    dali.queryLampFailure();
+  }
+  if (comMsg=="queryfade"){
+    Serial.println("Fade time and rate");
+    dali.queryFadeTimeAndRate();
+  }
 
   if (dali.cmdCheck(comMsg, cmd1, cmd2)) {
     dali.transmit(cmd1, cmd2);  // command in binary format: (address byte, command byte)
