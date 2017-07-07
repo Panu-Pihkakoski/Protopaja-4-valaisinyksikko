@@ -51,6 +51,7 @@ allowing us to transmit even with up to 100% in clock speed difference
 #define UP 0b00000001
 #define DOWN 0b00000010
 #define STEP_UP 0b00000011
+#define STEP_DOWN 0b00000100
 #define STEP_DOWN_AND_OFF 0b00000111
 #define ON_AND_STEP_UP 0b00001000
 #define STORE_DTR 0b00100001
@@ -103,6 +104,7 @@ class Dali
     void up(uint8_t num);
     void down(uint8_t num);
     void stepUp(uint8_t num);
+    void stepDown(uint8_t num);
     void setLevel(uint8_t num);
     void setFade();
     void queryLampPowerOn();
