@@ -16,14 +16,7 @@ const int DALI_RX_A = 0;
 # define RESET 0b00100000
 
 //omaa koodia
-#define LIGHT_ADDRESS 0b00000001 //aina sama, koska kaytetaan vain yhta valoa
-#define QUERY_DEVICE_TYPE 0b10011001
-#define QUERY_MAX_LEVEL 0b10100001
-#define RECALL_MAX_LEVEL 0b00000101
-#define RECALL_MIN_LEVEL 0b00000110
-#define UP 0b00000001
-#define DOWN 0b00000010
-#define STEP_UP 0b00000011
+
 
 
 void setup() {
@@ -46,8 +39,22 @@ void help() {
   Serial.println("off -  broadcast off 0%");
   Serial.println("scan -  device short address scan");
   Serial.println("initialise -  start process of initialisation");
-  Serial.println("sinus");
-  Serial.println("status - Query status");
+  Serial.println("sinus - start sinus function");
+  Serial.println("status - query status");
+  Serial.println("loop - 10 status queries");
+  Serial.println("type - query device type");
+  Serial.println("querylvl - query current, max and min level");
+  Serial.println("max - set level to max");
+  Serial.println("min - set level to min");
+  Serial.println("up - power up 200ms with current fade rate");
+  Serial.println("down - power down 200ms with current fade rate");
+  Serial.println("up2 - loop up 10 times");
+  Serial.println("down2 - loop down 10 times");
+  Serial.println("stepup - power up one level, not working atm");
+  Serial.println("lvl - set level to ~100 (around half power)");
+  Serial.println("fade - set current level to fade rate");
+  Serial.println("querylamp - query lamp power on and lamp failure");
+  Serial.println("queryfade - query fade rate");
   Serial.println();
 }
 
@@ -112,7 +119,7 @@ void loop() {
     dali.scanShortAdd(addr);
     //omaa koodia
     Serial.println("Address saved:");
-    Serial.println(addr); 
+    Serial.println(addr);
   }; // scan short addresses
 
   if (comMsg == "on") {
@@ -131,21 +138,21 @@ void loop() {
     help();
   }; //help
 
-  if (comMsg == "status"){
+  if (comMsg == "status") {
     Serial.println("Device status");
     dali.queryStatus();
   }
-  if (comMsg == "loop"){
-    for(int i = 0; i < 20; i++){
+  if (comMsg == "loop") {
+    for (int i = 0; i < 20; i++) {
       dali.queryStatus();
-      delay(500); 
+      delay(500);
     }
   }
-  if (comMsg == "type"){
+  if (comMsg == "type") {
     Serial.println("Device type:");
     dali.queryDeviceType();
   }
-  if(comMsg == "querylvl"){
+  if (comMsg == "querylvl") {
     Serial.println("Current level:");
     dali.queryActualLevel();
     Serial.println("Max level:");
@@ -153,49 +160,60 @@ void loop() {
     Serial.println("Min level:");
     dali.queryMinLevel();
   }
-  if (comMsg == "max"){
+  if (comMsg == "max") {
     Serial.println("Setting level to max");
     dali.recallMaxLevel();
   }
-  if (comMsg == "min"){
+  if (comMsg == "min") {
     Serial.println("Setting level to min");
     dali.recallMinLevel();
   }
-  if (comMsg == "up"){
+  if (comMsg == "up") {
     //dali.setFade();
     Serial.println("Power up");
     dali.up(1);
   }
-  if (comMsg == "down"){
+  if (comMsg == "down") {
     //dali.setFade();
     Serial.println("Power down");
     dali.down(1);
   }
-  if (comMsg == "stepup"){
+  if (comMsg == "stepup") {
     Serial.println("Step up");
     dali.stepUp(30);
   }
-  if (comMsg =="lvl"){
+  if (comMsg == "stepdown"){
+    Serial.println("Step down");
+    dali.stepDown(30);
+  }
+  if (comMsg == "lvl") {
     Serial.println("Setting level to 100");
     dali.setLevel(0b11100000);
   }
-  if (comMsg =="fade"){
+  if (comMsg == "fade") {
     Serial.println("Setting fade rate and time");
     dali.setFade();
   }
-  if (comMsg =="up2"){
-    for(int i = 0; i < 10; i++){
+  if (comMsg == "up2") {
+    for (int i = 0; i < 10; i++) {
       dali.up(1);
       delay(250);
     }
   }
-  if (comMsg =="querylamp"){
+  if (comMsg == "down2") {
+    for (int i = 0; i < 10; i++) {
+      dali.down(1);
+      delay(250);
+    }
+  }
+  if (comMsg == "querylamp") {
     Serial.println("Lamp power on:");
     dali.queryLampPowerOn();
     Serial.println("Lamp failure:");
     dali.queryLampFailure();
+    
   }
-  if (comMsg=="queryfade"){
+  if (comMsg == "queryfade") {
     Serial.println("Fade time and rate");
     dali.queryFadeTimeAndRate();
   }
