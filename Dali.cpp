@@ -135,8 +135,10 @@ void Dali::busTest() //DALI bus test
 	//Receive response from luminaries: max and min level
 	dali.transmit(BROADCAST_C, QUERY_STATUS);
 	maxLevel = dali.maxResponseLevel();
+    Serial.println(maxLevel);
 	dali.transmit(BROADCAST_C, QUERY_STATUS);
 	minLevel = dali.minResponseLevel();
+    Serial.println(minLevel);
 
 	dali.analogLevel = (int)(maxLevel + minLevel) / 2;
 	
@@ -357,7 +359,7 @@ void Dali::initialisation() {
 	dali.transmit(0b10100111, 0b00000000); //randomise
 
 	if (dali.msgMode) {
-		Serial.println("Searching fo long addresses:");
+		Serial.println("Searching for long addresses:");
 	}
 
 	while (longadd <= 0xFFFFFF - 2 and short_add <= 64) {
@@ -459,7 +461,6 @@ uint8_t Dali::receive() {
 	startFuncTime = micros();
 	
 	// add check for micros overlap here!!!
-
 	while (micros() - startFuncTime < dali.daliTimeout and i < arrLength)
 	{
 		// geting response
@@ -473,6 +474,11 @@ uint8_t Dali::receive() {
 		if (previousLogicLevel != currentLogicLevel) {
 			timeArray[i] = micros() - startFuncTime;
 			logicLevelArray[i] = currentLogicLevel;
+            //Serial.print(currentLogicLevel);
+            if(i==0) {
+                //Serial.println();
+                //Serial.println("logic level array");
+            }
 			previousLogicLevel = currentLogicLevel;
 			dali.getResponse = true;
 			i++;
@@ -581,6 +587,15 @@ void Dali::stepUp(uint8_t num)
 {
     for(uint8_t i = 0; i < num; i++){
         dali.transmit(LIGHT_ADDRESS, STEP_UP);
+        delay(10);
+    }
+}
+
+void Dali::stepDown(uint8_t num)
+{
+    for(uint8_t i = 0; i < num; i++){
+        dali.transmit(LIGHT_ADDRESS, STEP_DOWN);
+        delay(10);
     }
 }
 
