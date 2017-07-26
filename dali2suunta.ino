@@ -17,8 +17,6 @@ void setup() {
   digitalWrite(TX_PIN, HIGH);
   transmit(0b00000000, 00000111);
   Serial.begin(115200);
-  initialisation();
-  
 }
 
 void sendZero() {
@@ -56,10 +54,9 @@ void transmit(uint8_t byte1, uint8_t byte2) {
   digitalWrite(TX_PIN, LOW);
 }
 
-//TODO: korjaa
-//JOS LUETTU TAVU 0xFF PALAUTTAA VÄÄRIN 0
+
 uint8_t receive() {  
-  
+  ret = 0;
   int startTime = micros();
   attachInterrupt(digitalPinToInterrupt(RX_PIN), readRX, FALLING);
   while(micros() - startTime < timeoutMicros) {
@@ -69,25 +66,27 @@ uint8_t receive() {
       attachInterrupt(digitalPinToInterrupt(RX_PIN), readRX, CHANGE);
     }
   }
-  
+  /**
   Serial.print("HEX: ");
-  Serial.println((~ret) & 0xFF, HEX);
+  Serial.println(ret, HEX);
   Serial.print("BIN: ");
-  Serial.println((~ret) & 0xFF, BIN);
-  uint8_t response = 0;
-  response = (~ret) & 0xFF;
- 
-  
-  ret = 0;
-  return response;  
+  Serial.println(ret, BIN);
+  */
+  detachInterrupt(digitalPinToInterrupt(RX_PIN));
+  return ret;
 }
 
 void readRX() {
   
   ret = ret << 1;
-  ret = ret | digitalRead(RX_PIN);
+  ret = ret | ((~digitalRead(RX_PIN)) & 1);
   detachInterrupt(digitalPinToInterrupt(RX_PIN)); 
   change = true;
+}
+
+void readChange() {
+  change = true;
+  detachInterrupt(digitalPinToInterrupt(RX_PIN));
 }
 
 void initialisation() {
@@ -108,43 +107,62 @@ void initialisation() {
   delay(delaytime);
   transmit(0b10100101, 0b00000000);
   delay(delaytime);
-  transmit(0b10100111, 0b00000000); // randmomize addresses
+  transmit(0b10100111, 0b00000000); // randomize addresses
   delay(delaytime);
   transmit(0b10100111, 0b00000000);
+  delay(delaytime);
+
+
 
   while(high_longadd - low_longadd > 1) {
     //long address sent to luminaries
-    Serial.println(high_longadd, DEC);
-    Serial.println(low_longadd, DEC);
-    Serial.println(longadd, DEC);
+    Serial.println(high_longadd, HEX);
+    Serial.println(low_longadd, HEX);
+    Serial.println(longadd, HEX);
     transmitLongAdd(longadd);
+    delay(delaytime);
     //check if any long address <= the one sent
-    transmit(0b10101001, 0b00000000); //compare
-    if(receive() != 0) {
+    transmit(0b10101001, 0b00000000);//compare
+    delayMicroseconds(1600);
+    attachInterrupt(digitalPinToInterrupt(RX_PIN), readChange, FALLING);
+    int startTime = micros();
+    while(micros() - startTime < timeoutMicros) {
+      if(change) {
+        break; 
+      }
+    }
+    if(change) {
+      change = false;
       high_longadd = longadd;
     } else {
+      detachInterrupt(digitalPinToInterrupt(RX_PIN));
       low_longadd = longadd;
     }
     
     longadd = (low_longadd + high_longadd) / 2;
     Serial.println("-----------");
+    delay(delaytime);
   }
 
   
   //check if luminary is in high or low longadd
   transmitLongAdd(low_longadd);
+  delay(delaytime);
   transmit(0b10101001, 0b00000000); //compare
-
+  delay(delaytime);
+  
   if(receive() != 0) {
-    transmit(0b10110111, 0b00000011); //program short address 000001
+    transmit(0b10110111, 0b00000111); //program short address 000001
     Serial.println("Low long Address found. Assigning it short address 000001");
     
   } else {
     transmitLongAdd(high_longadd);
+    delay(delaytime);
     transmit(0b10110111, 0b00000000); //compare
     if(receive() != 0){
-      transmit(0b10110111, 0b00000011); //program short address 000001
-      Serial.print("High longAddress found. Assigning it short address 000001");
+      delay(delaytime);
+      transmit(0b10110111, 0b00000111); //program short address 000001
+      Serial.println("High longAddress found. Assigning it short address 000001");
     } else {
       Serial.println("Initialisation failed");
     }
@@ -170,18 +188,58 @@ void transmitLongAdd(long longadd) {
   transmit(0b10110101, longadd);
   delay(20);
 }
+//Goes through the short address space and returns the first found short address
+//returns the valid short address, if no valid short address is found returns -1
+uint8_t scan(){
+  uint8_t add_byte;   //the actual byte sent to DALI
+  uint8_t short_add;  //short address
+
+  //loops through all 64 addresses and sends a query for version number
+  //if a return byte is received, the loop has found a valid short address and the function returns it
+  for(short_add = 0; short_add < 64; short_add++){
+    add_byte = 1 + (short_add << 1); 
+    
+    delay(10);
+    transmit(add_byte, 0x97); //query for version number
+    delayMicroseconds(100);
+    uint8_t response = receive();
+    Serial.print("Checking short address: " );
+    Serial.print(add_byte >> 1);
+    Serial.print(", received: ");
+    Serial.println(response);
+    
+    if(response != 0){
+      delay(100);
+      transmit(add_byte, 0x05);
+      delay(500);
+      transmit(add_byte, 0x00);
+      Serial.println("Short address found:");
+      Serial.println(short_add);
+      return short_add;
+    }
+  }
+  return -1;
+}
+
 void loop() {
-  transmit(0b00000001, 0b00000110);
+  uint8_t response = 0;
+  /*scan();
+  delay(200);
+  transmit(0b00000111, 0b00000110);
   delay(100);
-  transmit(0b00000001, 0x90);
-  Serial.println(receive());
+  */
+  transmit(0b00000111, 0x90);
+  //delayMicroseconds(100);
+  response = receive();
+  Serial.println(response);
+  /*
   Serial.println("------------");
   delay(1000);
   
-  transmit(0b00000001, 0b00000000);
+  transmit(0b00000111, 0b00000000);
   delay(100);
-  transmit(0b00000001, 0x90);
-  Serial.println(receive());
-  Serial.println("------------");
-  delay(1000);
+  
+  Serial.println("------------"); 
+  */
+  
 }
