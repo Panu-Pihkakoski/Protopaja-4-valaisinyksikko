@@ -1,4 +1,10 @@
 # Protopaja-4-valaisinyksikko
-Valaisinyksikkö, aluksi koodi jolla testatiin DALI:a
+Adafruit Feather nRF52 Bluefruit opas:
 
-https://create.arduino.cc/projecthub/NabiyevTR/simple-dali-controller-506e44
+https://learn.adafruit.com/bluefruit-nrf52-feather-learning-guide?view=all
+
+Arduino BSP:n asentaminen:
+
+https://learn.adafruit.com/bluefruit-nrf52-feather-learning-guide?view=all#arduino-bsp-setup
+
+DallasTemperature ja OneWire -kirjastot voidaan asentaa suoraan Arduinon Library Managerin kautta.
